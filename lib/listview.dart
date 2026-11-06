@@ -12,22 +12,19 @@ class _ListViewPageState extends State<ListViewPage> {
 
   final formKey = GlobalKey<FormState>();
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+  final email = TextEditingController();
+  final password = TextEditingController();
+  final confirmPassword = TextEditingController();
 
   bool isLogin = true;
 
-  final emailPattern =
-      RegExp(r'^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$');
-
-  final passwordPattern = RegExp(r'^.{6,}$');
+  final emailRegex = RegExp(r'^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login & Registration"),
+        title: const Text("Login Page"),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
@@ -40,7 +37,6 @@ class _ListViewPageState extends State<ListViewPage> {
             isLogin ? "Login" : "Registration",
             style: const TextStyle(
               fontSize: 25,
-              fontWeight: FontWeight.bold,
               color: Colors.green,
             ),
           ),
@@ -54,15 +50,16 @@ class _ListViewPageState extends State<ListViewPage> {
 
                 // Email
                 TextFormField(
-                  controller: emailController,
+                  controller: email,
                   decoration: const InputDecoration(
                     labelText: "Email",
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
+                    if (value!.isEmpty) {
                       return "Enter email";
-                    } else if (!emailPattern.hasMatch(value)) {
+                    }
+                    if (!emailRegex.hasMatch(value)) {
                       return "Invalid email";
                     }
                     return null;
@@ -73,16 +70,17 @@ class _ListViewPageState extends State<ListViewPage> {
 
                 // Password
                 TextFormField(
-                  controller: passwordController,
+                  controller: password,
                   obscureText: true,
                   decoration: const InputDecoration(
                     labelText: "Password",
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
+                    if (value!.isEmpty) {
                       return "Enter password";
-                    } else if (!passwordPattern.hasMatch(value)) {
+                    }
+                    if (value.length < 6) {
                       return "Minimum 6 characters";
                     }
                     return null;
@@ -94,16 +92,17 @@ class _ListViewPageState extends State<ListViewPage> {
                 // Confirm Password
                 if (!isLogin)
                   TextFormField(
-                    controller: confirmPasswordController,
+                    controller: confirmPassword,
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: "Confirm Password",
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value!.isEmpty) {
                         return "Confirm password";
-                      } else if (value != passwordController.text) {
+                      }
+                      if (value != password.text) {
                         return "Password does not match";
                       }
                       return null;
@@ -112,16 +111,14 @@ class _ListViewPageState extends State<ListViewPage> {
 
                 const SizedBox(height: 20),
 
-                // Login / Register Button
+                // Button
                 ElevatedButton(
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            isLogin
-                                ? "Login Successful"
-                                : "Registration Successful",
+                            isLogin ? "Login Successful" : "Registration Successful",
                           ),
                         ),
                       );
@@ -134,23 +131,20 @@ class _ListViewPageState extends State<ListViewPage> {
                   child: Text(isLogin ? "Login" : "Register"),
                 ),
 
-                const SizedBox(height: 10),
-
-                // Switch Button
+                // Switch
                 TextButton(
                   onPressed: () {
                     setState(() {
                       isLogin = !isLogin;
-                      formKey.currentState!.reset();
-                      passwordController.clear();
-                      confirmPasswordController.clear();
+                      email.clear();
+                      password.clear();
+                      confirmPassword.clear();
                     });
                   },
                   child: Text(
                     isLogin
                         ? "New User? Register Here"
                         : "Already Registered? Login Here",
-                    style: const TextStyle(color: Colors.green),
                   ),
                 ),
               ],
